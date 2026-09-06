@@ -12,20 +12,33 @@ return {
   lsp = {
     emmylua_ls = {
       settings = {
-        Lua = {
+        emmylua = {
           runtime = {
             version = "LuaJIT",
             extensions = { ".lua" },
             requirePattern = {
+              "?.lua",
+              "?/init.lua",
               "lua/?.lua",
               "lua/?/init.lua",
             },
           },
           workspace = {
-            library = {
-              "$VIMRUNTIME",
-              "$HOME/.local/share/nvim/lazy",
-            },
+            library = vim.list_extend(
+              { "$VIMRUNTIME", "$NVIM_DEV_DIR" },
+              vim.tbl_map(function(path)
+                return {
+                  path = path,
+                  ignoreGlobs = {
+                    "**/*_spec.lua",
+                    "**/scripts/**",
+                    "**/test/**",
+                    "**/tests/**",
+                    "**/spec/**",
+                  },
+                }
+              end, vim.fn.globpath(vim.fn.stdpath("data") .. "/lazy", "*/lua", false, true))
+            ),
           },
         },
       },
